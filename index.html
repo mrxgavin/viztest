@@ -1,0 +1,866 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Gentle Introduction to Graph Ordinary Differential Equations</title>
+  
+  <!-- Styles similar to Distill -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600,700" rel="stylesheet" type="text/css">
+  
+  <style>
+    :root {
+      --primary-color: #004080;
+      --text-color: rgba(0, 0, 0, 0.85);
+      --light-gray: rgba(0, 0, 0, 0.05);
+      --header-height: 60px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.07);
+      --hover-shadow: 0 1px 4px rgba(0,0,0,0.14);
+    }
+    
+    body {
+      font-family: 'Source Sans Pro', Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--text-color);
+      line-height: 1.6;
+      font-size: 17px;
+    }
+    
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    header {
+      height: var(--header-height);
+      border-bottom: 1px solid var(--light-gray);
+      box-shadow: var(--shadow);
+      position: fixed;
+      width: 100%;
+      background: white;
+      z-index: 100;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+    
+    .logo {
+      font-weight: 700;
+      color: var(--primary-color);
+      font-size: 22px;
+    }
+    
+    nav {
+      display: flex;
+    }
+    
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: var(--text-color);
+    }
+    
+    main {
+      padding-top: calc(var(--header-height) + 40px);
+    }
+    
+    h1 {
+      font-weight: 700;
+      font-size: 42px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    
+    h2 {
+      font-weight: 600;
+      font-size: 28px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+    }
+    
+    h3 {
+      font-weight: 600;
+      font-size: 22px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    
+    p {
+      margin-bottom: 20px;
+    }
+    
+    .authors {
+      margin: 30px 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    
+    .author {
+      margin-right: 30px;
+      margin-bottom: 15px;
+    }
+    
+    .author-name {
+      font-weight: 600;
+    }
+    
+    .author-affiliation {
+      font-size: 15px;
+      color: rgba(0,0,0,0.6);
+    }
+    
+    .publication-details {
+      border-top: 1px solid var(--light-gray);
+      border-bottom: 1px solid var(--light-gray);
+      padding: 15px 0;
+      margin: 30px 0;
+      font-size: 15px;
+    }
+    
+    .publication-date, .doi {
+      margin-right: 20px;
+      display: inline-block;
+    }
+    
+    .abstract {
+      font-size: 19px;
+      line-height: 1.5;
+      margin: 30px 0;
+      font-weight: 300;
+    }
+    
+    .figure {
+      margin: 30px 0;
+      text-align: center;
+    }
+    
+    .figure img {
+      max-width: 100%;
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+    }
+    
+    .figure-caption {
+      font-size: 15px;
+      color: rgba(0,0,0,0.6);
+      margin-top: 10px;
+      text-align: left;
+    }
+    
+    .interactive {
+      background: var(--light-gray);
+      border-radius: 4px;
+      padding: 20px;
+      margin: 30px 0;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .math {
+      padding: 10px 0;
+    }
+    
+    code {
+      font-family: 'Source Code Pro', monospace;
+      background: var(--light-gray);
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 15px;
+    }
+    
+    pre {
+      background: var(--light-gray);
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    
+    footer {
+      margin-top: 60px;
+      padding: 40px 0;
+      border-top: 1px solid var(--light-gray);
+      font-size: 15px;
+      color: rgba(0,0,0,0.6);
+    }
+    
+    .citation {
+      background: var(--light-gray);
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 14px;
+      margin: 30px 0;
+      white-space: pre-wrap;
+    }
+    
+    .node {
+      fill: #5a5a5a;
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+    
+    .link {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+    
+    .node:hover {
+      fill: var(--primary-color);
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: 'Source Sans Pro', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: #005db3;
+    }
+    
+    .collapsible-section {
+      margin: 20px 0;
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+    }
+    
+    .collapsible-header {
+      padding: 10px 15px;
+      background-color: var(--light-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .collapsible-content {
+      padding: 15px;
+      display: none;
+    }
+    
+    .equation-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 30px 0;
+    }
+    
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    /* Add responsive styling */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 32px;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+      
+      h3 {
+        font-size: 20px;
+      }
+      
+      .container {
+        padding: 0 15px;
+      }
+    }
+  </style>
+  
+  <!-- MathJax for mathematical notation -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- D3.js for visualizations -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <!-- Custom Graph ODE visualization -->
+  <script src="graph-ode-visualization.js"></script>
+  
+  <!-- PI3K-Akt-mTOR pathway visualization -->
+  <script src="pi3k-akt-mtor-ode.js"></script>
+</head>
+<body>
+
+  
+  <main class="container">
+    <h1>A Gentle Introduction to Graph Ordinary Differential Equations</h1>
+    
+    <div class="authors">
+      <div class="author">
+        <div class="author-name">X</div>
+        <div class="author-affiliation"></div>
+      </div>
+    </div>
+    
+    
+    <div class="abstract">
+      <p>Neural networks have been adapted to leverage the structure and properties of graphs. We extend this further by introducing Graph Ordinary Differential Equations (Graph ODEs), a framework that combines the power of Graph Neural Networks with the continuous-time modeling capabilities of Neural ODEs. We explore how this unified approach enables modeling of dynamic systems on graph-structured data, with applications to biological signal pathways.</p>
+    </div>
+    
+    
+    <h2>Introduction</h2>
+    
+    <p>Graphs are all around us; real-world objects are often defined in terms of their connections to other things. A set of objects, and the connections between them, are naturally expressed as a <em>graph</em>. While Graph Neural Networks (GNNs) have revolutionized how we learn from graph-structured data, they traditionally operate in discrete steps. Similarly, Neural Ordinary Differential Equations (Neural ODEs) have opened new possibilities for modeling continuous-time dynamics, but they are typically applied to regular data structures. The Graph ODE framework bridges this gap, enabling continuous-time modeling on irregular graph structures.</p>
+    
+    <div class="interactive">
+      <div id="graph-demo" style="width: 100%; height: 300px;"></div>
+    </div>
+    <div class="figure-caption">Hover over a node in the diagram above to see how information propagates continuously through the graph over time. This illustrates the core idea behind Graph ODEs.</div>
+    
+    <h2>Graphs and Their Applications</h2>
+    
+    <p>To start, let's establish what a graph is. A graph represents the relations (<em>edges</em>) between a collection of entities (<em>nodes</em>).</p>
+    
+    <div class="interactive">
+      <div id="graph-explanation" style="width: 100%; height: 250px;"></div>
+    </div>
+    <div class="figure-caption">Three types of attributes we might find in a graph, hover over to highlight each attribute.</div>
+    
+    <p>In biological contexts, such as the FGFR4 signaling network, nodes might represent proteins or genes, while edges represent interactions or regulatory relationships.</p>
+    
+    <h2>From Graph Neural Networks to Graph ODEs</h2>
+    
+    <p>Graph Neural Networks (GNNs) process graph-structured data by iteratively updating node representations based on their neighbors' features. This discrete message-passing mechanism is powerful but limited when modeling systems that evolve continuously over time.</p>
+    
+    <p>Traditional GNNs update node features through discrete layers:</p>
+    
+    <div class="equation-container">
+      <div class="math">
+        <p>\[\mathbf{h}_i^{(l+1)} = \phi \left( \mathbf{h}_i^{(l)}, \text{AGG}(\{\mathbf{h}_j^{(l)} : j \in \mathcal{N}(i)\}) \right)\]</p>
+      </div>
+      <div class="figure-caption">
+        Node feature update in standard GNNs, where $\mathbf{h}_i^{(l)}$ is the feature of node $i$ at layer $l$, $\mathcal{N}(i)$ is the neighborhood of node $i$, AGG is an aggregation function, and $\phi$ is a transformation function.
+      </div>
+    </div>
+    
+    <p>Neural ODEs, on the other hand, define the rate of change of a system's state using a neural network, allowing continuous-time modeling but lacking the structured inductive bias needed for graph data.</p>
+    
+    <p>Graph ODEs combine these approaches by parameterizing the derivative of node features with respect to time using a graph neural network:</p>
+    
+    <div class="equation-container">
+      <div class="math">
+        <p>\[\frac{d\mathbf{H}(t)}{dt} = f_\theta(\mathbf{H}(t), \mathbf{G})\]</p>
+      </div>
+      <div class="figure-caption">
+        The Graph ODE formulation, where $\mathbf{H}(t)$ represents the node features at time $t$, $\mathbf{G}$ is the graph structure, and $f_\theta$ is a GNN parameterized by $\theta$.
+      </div>
+    </div>
+    
+    <h2>Interactive Graph ODE Visualization</h2>
+    
+    <p>The visualization below demonstrates the core concept of Graph ODEs: continuous message passing through a graph structure over time. The initial signal starts at node A and propagates through the network according to the edge weights.</p>
+    
+    <div class="interactive">
+      <div id="graph-ode-visualization" style="width: 100%; height: 400px;"></div>
+      <button id="toggle-explanation">Show Explanation</button>
+      <div id="visualization-explanation" style="display: none; margin-top: 15px; padding: 10px; background: #f8f8f8; border-radius: 4px;">
+        <p>This visualization demonstrates a simple diffusion process modeled as a Graph ODE. Each node has a scalar value (shown as node opacity and as a number), and the rate of change is determined by the difference in values between connected nodes, weighted by the edge strengths.</p>
+        <p>The mathematical formulation is: $\frac{dh_i(t)}{dt} = \sum_{j \in \mathcal{N}(i)} w_{ij}(h_j(t) - h_i(t))$</p>
+        <p>Where:</p>
+        <ul>
+          <li>$h_i(t)$ is the value of node $i$ at time $t$</li>
+          <li>$\mathcal{N}(i)$ is the set of neighbors of node $i$</li>
+          <li>$w_{ij}$ is the weight of the edge from node $j$ to node $i$</li>
+        </ul>
+        <p>The plot below the graph shows how node values evolve over time. Click "Play" to start the simulation, "Pause" to stop it, and "Reset" to start over. Hover over a node to highlight its connections and trajectory.</p>
+      </div>
+    </div>
+    
+    <h2>PI3K-Akt-mTOR Pathway Visualization</h2>
+    
+    <p>Below is a more realistic example of Graph ODEs applied to the PI3K-Akt-mTOR signaling pathway, which is crucial in cell growth, metabolism, and cancer development. This pathway contains feedback loops that create oscillatory behavior - a common feature in biological systems.</p>
+    
+    <div class="interactive">
+      <div id="pi3k-akt-mtor-visualization" style="width: 100%; height: 450px;"></div>
+      <button id="toggle-pathway-explanation">Show Explanation</button>
+      <div id="pathway-visualization-explanation" style="display: none; margin-top: 15px; padding: 10px; background: #f8f8f8; border-radius: 4px;">
+        <p>This visualization demonstrates the PI3K-Akt-mTOR signaling pathway as a Graph ODE system. The dynamics include:</p>
+        <ul>
+          <li><strong>RTK (Receptor Tyrosine Kinase)</strong>: Activated by external growth factors, oscillates to simulate changing environmental conditions</li>
+          <li><strong>IRS1 (Insulin Receptor Substrate 1)</strong>: Activated by RTK, inhibited by S6K (negative feedback loop)</li>
+          <li><strong>PI3K (Phosphoinositide 3-kinase)</strong>: Activated by IRS1, leads to Akt activation</li>
+          <li><strong>PTEN (Phosphatase and tensin homolog)</strong>: Inhibits the Akt pathway, acts as a tumor suppressor</li>
+          <li><strong>Akt (Protein Kinase B)</strong>: Activated by PI3K and mTORC2, inhibited by PTEN</li>
+          <li><strong>mTORC1/2 (Mammalian target of rapamycin complexes)</strong>: mTORC1 is activated by Akt; mTORC2 activates Akt</li>
+          <li><strong>S6K (Ribosomal protein S6 kinase)</strong>: Activated by mTORC1, inhibits IRS1 to create a negative feedback loop</li>
+        </ul>
+        <p>The negative feedback loop (S6K inhibiting IRS1) creates oscillatory behavior, which is common in biological signaling networks. Hover over nodes to see details and observe how the activation levels change over time.</p>
+        <p>The Graph ODE formulation captures the continuous dynamics of this pathway, allowing for simulation of drug effects, mutations, and other perturbations to the system.</p>
+      </div>
+    </div>
+    
+    <h2>Applications in Signal Pathway Modeling</h2>
+    
+    <p>Biological signal pathways, like the FGFR4 network, involve complex interactions between proteins that change continuously over time. Traditional approaches model these systems with hand-crafted ODEs based on known biochemical reactions. However, these models require extensive domain knowledge and may miss unknown interactions.</p>
+    
+    <p>Graph ODEs offer a powerful alternative by learning the dynamics directly from data while respecting the pathway's network structure. This approach can:</p>
+    
+    <ul>
+      <li>Capture complex nonlinear dynamics</li>
+      <li>Identify previously unknown interactions</li>
+      <li>Generalize across different experimental conditions</li>
+      <li>Integrate prior knowledge with data-driven learning</li>
+    </ul>
+    
+    <h3>FGFR4 Signaling Network: A Case Study</h3>
+    
+    <p>The Fibroblast Growth Factor Receptor 4 (FGFR4) pathway plays a crucial role in cell growth, differentiation, and cancer development. </p>
+    
+    <div class="interactive">
+      <div id="fgfr4-network" style="width: 100%; height: 300px;"></div>
+    </div>
+    <div class="figure-caption">Visualization of the FGFR4 signaling network. Nodes represent proteins, and edges represent interactions. Hover over nodes to see protein names and interactions.</div>
+    
+    <p>In traditional ODE modeling of signaling pathways, each protein's concentration change is described by equations based on biochemical principles:</p>
+    
+    <div class="equation-container">
+      <div class="math">
+        <p>\[\frac{d[P_i]}{dt} = \sum_j k_{j}^+ [P_j] - k_{i}^- [P_i]\]</p>
+      </div>
+      <div class="figure-caption">
+        A typical ODE for protein concentration dynamics, where $[P_i]$ is the concentration of protein $i$, and $k^+$ and $k^-$ are rate constants for production and degradation.
+      </div>
+    </div>
+    
+    <p>The Graph ODE approach to modeling the FGFR4 pathway involves:</p>
+    
+    <ol>
+      <li><strong>Graph Construction</strong>: Representing proteins as nodes and interactions as edges</li>
+      <li><strong>Initial State</strong>: Setting baseline protein concentrations from experimental data</li>
+      <li><strong>Dynamics Modeling</strong>: Using a GNN to learn how protein activities propagate through the network</li>
+      <li><strong>Simulation</strong>: Solving the Graph ODE to predict protein activities over time</li>
+      <li><strong>Validation</strong>: Comparing with experimental time-series data</li>
+    </ol>
+    
+    <div class="collapsible-section">
+      <div class="collapsible-header">
+        <h4 style="margin: 0;">Example Code: Graph ODE for Signaling Pathways</h4>
+        <span>+</span>
+      </div>
+      <div class="collapsible-content">
+        <pre><code>import torch
+import torch.nn as nn
+from torch_geometric.nn import GCNConv
+from torchdiffeq import odeint
+
+class SignalPathwayGNN(nn.Module):
+    """Graph neural network for signal pathway dynamics"""
+    def __init__(self, node_dim, edge_types):
+        super().__init__()
+        self.edge_embedding = nn.Embedding(edge_types, edge_dim)
+        self.message_nn = nn.Sequential(
+            nn.Linear(node_dim*2 + edge_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim)
+        )
+        self.update_nn = nn.Sequential(
+            nn.Linear(node_dim + hidden_dim, node_dim),
+            nn.Tanh()  # Bounded activation to prevent instability
+        )
+        
+    def forward(self, h, edge_index, edge_type):
+        # Embed edge types
+        edge_attr = self.edge_embedding(edge_type)
+        
+        # Compute messages
+        src, dst = edge_index
+        src_h, dst_h = h[src], h[dst]
+        edge_messages = torch.cat([src_h, dst_h, edge_attr], dim=1)
+        messages = self.message_nn(edge_messages)
+        
+        # Aggregate messages
+        aggregated = scatter_mean(messages, dst, dim=0, dim_size=h.size(0))
+        
+        # Update node states
+        return self.update_nn(torch.cat([h, aggregated], dim=1))
+
+class SignalPathwayODE(nn.Module):
+    """ODE function for signal pathway dynamics"""
+    def __init__(self, node_dim, edge_types):
+        super().__init__()
+        self.gnn = SignalPathwayGNN(node_dim, edge_types)
+    
+    def forward(self, t, h, edge_index, edge_type):
+        """Compute dh/dt"""
+        return self.gnn(h, edge_index, edge_type)
+        
+def train_model(model, graph, times, observations):
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    
+    for epoch in range(100):
+        optimizer.zero_grad()
+        
+        # Initial state
+        h0 = graph.x
+        
+        # Solve ODE
+        solution = odeint(
+            lambda t, h: model(t, h, graph.edge_index, graph.edge_type),
+            h0,
+            times,
+            method='dopri5'
+        )
+        
+        # Compute loss
+        loss = sum(F.mse_loss(solution[i], observations[i]) for i in range(len(times)))
+        
+        # Backward and optimize
+        loss.backward()
+        optimizer.step()
+        
+        print(f"Epoch {epoch}, Loss: {loss.item()}")</code></pre>
+      </div>
+    </div>
+    
+    <p>By applying the Graph ODE framework to this network, we can model how signals propagate through the pathway over time, predicting the effects of perturbations and identifying potential therapeutic targets.</p>
+    
+    <h2>Advantages of Graph ODEs for Biological Networks</h2>
+    
+    <p>The Graph ODE approach offers several benefits for FGFR4 pathway research:</p>
+    
+    <ol>
+      <li><strong>Unified Modeling Framework</strong>: Combines network structure with continuous dynamics</li>
+      <li><strong>Flexibility</strong>: Can model both known and potentially unknown interactions</li>
+      <li><strong>Data Integration</strong>: Leverages both prior knowledge and experimental data</li>
+      <li><strong>Hypothesis Generation</strong>: Identifies potential new interactions or regulatory mechanisms</li>
+      <li><strong>Drug Response Prediction</strong>: Simulates effects of targeting specific nodes in the pathway</li>
+    </ol>
+    
+    <h2>Future Directions</h2>
+    
+    <p>The Graph ODE framework for signal pathway modeling opens several exciting research directions:</p>
+    
+    <ol>
+      <li><strong>Multi-scale Modeling</strong>: Connecting molecular-level dynamics with cellular and tissue-level phenomena</li>
+      <li><strong>Integrating Multi-omics Data</strong>: Incorporating genomics, proteomics, and metabolomics data into pathway models</li>
+      <li><strong>Personalized Medicine</strong>: Tailoring pathway models to individual patients based on genetic profiles</li>
+      <li><strong>Drug Discovery</strong>: Using Graph ODEs to identify potential therapeutic targets and predict drug responses</li>
+      <li><strong>Hybrid Models</strong>: Combining Graph ODEs with other approaches like agent-based models or partial differential equations</li>
+    </ol>
+    
+    <h2>References</h2>
+    
+    <div class="citation">
+@article{chen2018neural,
+  title={Neural ordinary differential equations},
+  author={Chen, Ricky TQ and Rubanova, Yulia and Bettencourt, Jesse and Duvenaud, David K},
+  journal={Advances in neural information processing systems},
+  volume={31},
+  year={2018}
+}
+
+@article{sanchez2021gentle,
+  author = {Sanchez-Lengeling, Benjamin and Reif, Emily and Pearce, Adam and Wiltschko, Alexander B.},
+  title = {A Gentle Introduction to Graph Neural Networks},
+  journal = {Distill},
+  year = {2021},
+  doi = {10.23915/distill.00033}
+}
+
+@article{nguyen2020fgfr4,
+  title={Mathematical modelling of the FGFR4 signaling network},
+  author={Nguyen, Lan and Others},
+  journal={Journal},
+  year={2020}
+}
+    </div>
+    
+    <footer>
+      <p>For attribution in academic contexts, please cite this work as:</p>
+    </footer>
+  </main>
+  
+  <script>
+    // Simple D3.js visualization for the graph demo
+    document.addEventListener('DOMContentLoaded', function() {
+      // Basic graph data
+      const nodes = [
+        {id: 0, name: "A", x: 200, y: 150},
+        {id: 1, name: "B", x: 300, y: 100},
+        {id: 2, name: "C", x: 300, y: 200},
+        {id: 3, name: "D", x: 400, y: 150},
+        {id: 4, name: "E", x: 250, y: 50},
+        {id: 5, name: "F", x: 250, y: 250}
+      ];
+      
+      const links = [
+        {source: 0, target: 1},
+        {source: 0, target: 2},
+        {source: 1, target: 3},
+        {source: 2, target: 3},
+        {source: 0, target: 4},
+        {source: 0, target: 5}
+      ];
+      
+      // Create SVG
+      const svg = d3.select("#graph-demo")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", "0 0 600 300");
+      
+      // Add links
+      const link = svg.selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("x1", d => nodes[d.source].x)
+        .attr("y1", d => nodes[d.source].y)
+        .attr("x2", d => nodes[d.target].x)
+        .attr("y2", d => nodes[d.target].y);
+      
+      // Add nodes
+      const node = svg.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", 20)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .on("mouseover", function(event, d) {
+          d3.select(this).transition()
+            .duration(300)
+            .attr("r", 25);
+          
+          // Highlight connected nodes
+          const connected = links.filter(l => l.source === d.id || l.target === d.id);
+          const connectedNodes = connected.map(l => l.source === d.id ? l.target : l.source);
+          
+          svg.selectAll(".node")
+            .filter((n, i) => connectedNodes.includes(n.id))
+            .transition()
+            .duration(300)
+            .style("fill", "#0066cc");
+          
+          // Highlight connected links
+          svg.selectAll(".link")
+            .filter(l => l.source === d.id || l.target === d.id)
+            .transition()
+            .duration(300)
+            .style("stroke", "#0066cc")
+            .style("stroke-width", 3)
+            .style("stroke-opacity", 1);
+        })
+        .on("mouseout", function() {
+          d3.select(this).transition()
+            .duration(300)
+            .attr("r", 20);
+          
+          svg.selectAll(".node")
+            .transition()
+            .duration(300)
+            .style("fill", "#5a5a5a");
+          
+          svg.selectAll(".link")
+            .transition()
+            .duration(300)
+            .style("stroke", "#999")
+            .style("stroke-width", 1.5)
+            .style("stroke-opacity", 0.6);
+        });
+      
+      // Add labels
+      svg.selectAll("text")
+        .data(nodes)
+        .enter()
+        .append("text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y + 5)
+        .attr("text-anchor", "middle")
+        .attr("font-family", "Source Sans Pro")
+        .attr("font-size", "16px")
+        .attr("fill", "white")
+        .text(d => d.name);
+      
+      // Create the FGFR4 network visualization
+      const fgfr4_nodes = [
+        {id: 0, name: "FGFR4", x: 200, y: 150, type: "receptor"},
+        {id: 1, name: "FGF19", x: 100, y: 150, type: "ligand"},
+        {id: 2, name: "FRS2", x: 250, y: 100, type: "adaptor"},
+        {id: 3, name: "GRB2", x: 300, y: 70, type: "adaptor"},
+        {id: 4, name: "SOS", x: 350, y: 50, type: "enzyme"},
+        {id: 5, name: "RAS", x: 400, y: 80, type: "gprotein"},
+        {id: 6, name: "RAF", x: 450, y: 120, type: "kinase"},
+        {id: 7, name: "MEK", x: 450, y: 180, type: "kinase"},
+        {id: 8, name: "ERK", x: 400, y: 220, type: "kinase"},
+        {id: 9, name: "PI3K", x: 300, y: 200, type: "kinase"},
+        {id: 10, name: "AKT", x: 250, y: 230, type: "kinase"}
+      ];
+      
+      const fgfr4_links = [
+        {source: 1, target: 0, type: "binding"},
+        {source: 0, target: 2, type: "phosphorylation"},
+        {source: 2, target: 3, type: "binding"},
+        {source: 3, target: 4, type: "binding"},
+        {source: 4, target: 5, type: "activation"},
+        {source: 5, target: 6, type: "activation"},
+        {source: 6, target: 7, type: "phosphorylation"},
+        {source: 7, target: 8, type: "phosphorylation"},
+        {source: 0, target: 9, type: "activation"},
+        {source: 9, target: 10, type: "activation"}
+      ];
+      
+      // Create SVG for FGFR4 network
+      const fgfr4_svg = d3.select("#fgfr4-network")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", "0 0 600 300");
+      
+      // Add links for FGFR4 network
+      const fgfr4_link = fgfr4_svg.selectAll("line")
+        .data(fgfr4_links)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("x1", d => fgfr4_nodes[d.source].x)
+        .attr("y1", d => fgfr4_nodes[d.source].y)
+        .attr("x2", d => fgfr4_nodes[d.target].x)
+        .attr("y2", d => fgfr4_nodes[d.target].y)
+        .style("stroke-dasharray", d => d.type === "binding" ? "5,5" : "none");
+      
+      // Define color scale based on node type
+      const colorScale = d3.scaleOrdinal()
+        .domain(["receptor", "ligand", "adaptor", "enzyme", "gprotein", "kinase"])
+        .range(["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]);
+      
+      // Add nodes for FGFR4 network
+      const fgfr4_node = fgfr4_svg.selectAll("circle")
+        .data(fgfr4_nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", 15)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .style("fill", d => colorScale(d.type))
+        .on("mouseover", function(event, d) {
+          // Show tooltip
+          const tooltip = fgfr4_svg.append("g")
+            .attr("class", "tooltip");
+          
+          tooltip.append("rect")
+            .attr("x", d.x + 20)
+            .attr("y", d.y - 40)
+            .attr("width", 120)
+            .attr("height", 60)
+            .attr("rx", 5)
+            .attr("fill", "white")
+            .attr("stroke", "#ccc");
+          
+          tooltip.append("text")
+            .attr("x", d.x + 30)
+            .attr("y", d.y - 20)
+            .text(d.name)
+            .attr("font-weight", "bold");
+          
+          tooltip.append("text")
+            .attr("x", d.x + 30)
+            .attr("y", d.y)
+            .text("Type: " + d.type);
+          
+          // Highlight connected nodes and links
+          const connected_links = fgfr4_links.filter(l => l.source === d.id || l.target === d.id);
+          
+          fgfr4_svg.selectAll(".link")
+            .filter(l => l.source === d.id || l.target === d.id)
+            .style("stroke", "#0066cc")
+            .style("stroke-width", 3)
+            .style("stroke-opacity", 1);
+        })
+        .on("mouseout", function() {
+          // Remove tooltip
+          fgfr4_svg.selectAll(".tooltip").remove();
+          
+          // Reset link styles
+          fgfr4_svg.selectAll(".link")
+            .style("stroke", "#999")
+            .style("stroke-width", 1.5)
+            .style("stroke-opacity", 0.6);
+        });
+      
+      // Add labels for FGFR4 network
+      fgfr4_svg.selectAll(".node-label")
+        .data(fgfr4_nodes)
+        .enter()
+        .append("text")
+        .attr("class", "node-label")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y - 20)
+        .attr("text-anchor", "middle")
+        .attr("font-family", "Source Sans Pro")
+        .attr("font-size", "12px")
+        .text(d => d.name);
+      
+      // Add legend for FGFR4 network
+      const legend = fgfr4_svg.append("g")
+        .attr("transform", "translate(450, 20)");
+      
+      const legendData = [
+        {type: "receptor", label: "Receptor"},
+        {type: "ligand", label: "Ligand"},
+        {type: "adaptor", label: "Adaptor"},
+        {type: "kinase", label: "Kinase"}
+      ];
+      
+      legendData.forEach((d, i) => {
+        legend.append("circle")
+          .attr("cx", 0)
+          .attr("cy", i * 20)
+          .attr("r", 6)
+          .style("fill", colorScale(d.type));
+        
+        legend.append("text")
+          .attr("x", 10)
+          .attr("y", i * 20 + 4)
+          .text(d.label)
+          .style("font-size", "12px");
+      });
+      
+      // Add functionality for collapsible sections
+      const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+      collapsibleHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          if (content.style.display === 'block') {
+            content.style.display = 'none';
+            this.querySelector('span').textContent = '+';
+          } else {
+            content.style.display = 'block';
+            this.querySelector('span').textContent = '-';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html> 

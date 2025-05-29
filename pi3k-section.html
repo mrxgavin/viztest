@@ -1,0 +1,22 @@
+    <h2>PI3K-Akt-mTOR Pathway Visualization</h2>
+    
+    <p>Below is a more realistic example of Graph ODEs applied to the PI3K-Akt-mTOR signaling pathway, which is crucial in cell growth, metabolism, and cancer development. This pathway contains feedback loops that create oscillatory behavior - a common feature in biological systems.</p>
+    
+    <div class="interactive">
+      <div id="pi3k-akt-mtor-visualization" style="width: 100%; height: 450px;"></div>
+      <button id="toggle-pathway-explanation">Show Explanation</button>
+      <div id="pathway-visualization-explanation" style="display: none; margin-top: 15px; padding: 10px; background: #f8f8f8; border-radius: 4px;">
+        <p>This visualization demonstrates the PI3K-Akt-mTOR signaling pathway as a Graph ODE system. The dynamics include:</p>
+        <ul>
+          <li><strong>RTK (Receptor Tyrosine Kinase)</strong>: Activated by external growth factors, oscillates to simulate changing environmental conditions</li>
+          <li><strong>IRS1 (Insulin Receptor Substrate 1)</strong>: Activated by RTK, inhibited by S6K (negative feedback loop)</li>
+          <li><strong>PI3K (Phosphoinositide 3-kinase)</strong>: Activated by IRS1, leads to Akt activation</li>
+          <li><strong>PTEN (Phosphatase and tensin homolog)</strong>: Inhibits the Akt pathway, acts as a tumor suppressor</li>
+          <li><strong>Akt (Protein Kinase B)</strong>: Activated by PI3K and mTORC2, inhibited by PTEN</li>
+          <li><strong>mTORC1/2 (Mammalian target of rapamycin complexes)</strong>: mTORC1 is activated by Akt; mTORC2 activates Akt</li>
+          <li><strong>S6K (Ribosomal protein S6 kinase)</strong>: Activated by mTORC1, inhibits IRS1 to create a negative feedback loop</li>
+        </ul>
+        <p>The negative feedback loop (S6K inhibiting IRS1) creates oscillatory behavior, which is common in biological signaling networks. Hover over nodes to see details and observe how the activation levels change over time.</p>
+        <p>The Graph ODE formulation captures the continuous dynamics of this pathway, allowing for simulation of drug effects, mutations, and other perturbations to the system.</p>
+      </div>
+    </div> 
